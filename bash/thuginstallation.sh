@@ -320,19 +320,19 @@ YARA () {
 
 		# Download YARA & Unzip it 
 
-		echo "Downloading YARA..." && cd $DIR && wget https://github.com/plusvic/yara/archive/v3.4.0.tar.gz 2>> $DIR/bootstrap.log && tar xf v3.4.0.tar.gz && echo -e "\nSuccessfully downloaded and unzipped YARA!\n" || {
+		echo "Downloading YARA..." && cd $DIR && wget https://github.com/VirusTotal/yara/archive/v3.5.0.tar.gz 2>> $DIR/bootstrap.log && tar xf v3.4.0.tar.gz && echo -e "\nSuccessfully downloaded and unzipped YARA!\n" || {
 			echo "Failed to download or unzip YARA!"
 		}
 
 		# Compile and install YARA
 
-		echo -e "Compiling and installing YARA...\n" && cd yara-3.4.0/ && ./bootstrap.sh >> $DIR/bootstrap.log && ./configure >> $DIR/bootstrap.log && make >> $DIR/bootstrap.log && sudo make install >> $DIR/bootstrap.log && ldconfig && echo -e "\nSuccessfully installed YARA!\n" || {
+		echo -e "Compiling and installing YARA...\n" && cd yara-3.5.0/ && ./bootstrap.sh >> $DIR/bootstrap.log && ./configure >> $DIR/bootstrap.log && make >> $DIR/bootstrap.log && sudo make install >> $DIR/bootstrap.log && ldconfig && echo -e "\nSuccessfully installed YARA!\n" || {
 			echo "Failed to compile or install YARA!"
 		}   
 
 		# Install yara-python
 
-		echo -e "Installing yara-python...\n" && cd yara-python && python setup.py build >> $DIR/bootstrap.log && python setup.py install >> $DIR/bootstrap.log && echo -e "\nSuccessfully installed yara-python!" || {
+		echo -e "Installing yara-python...\n" && sudo pip install yara-python && echo -e "\nSuccessfully installed yara-python!" || {
 
 			echo "Failed to install yara-python!"
 		}
