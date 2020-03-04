@@ -271,7 +271,7 @@ yara() {
 
 		# Download YARA & Unzip it 
 
-		echo "Downloading YARA..." && cd $DIR && wget https://github.com/VirusTotal/yara/archive/v3.5.0.tar.gz >> "$bootstrapLog" 2>&1 && tar xf v3.5.0.tar.gz && success && echo -e "Successfully downloaded and unzipped YARA\n" || {
+		echo "Downloading YARA..." && cd $DIR && wget https://github.com/VirusTotal/yara/archive/v3.6.3.tar.gz >> "$bootstrapLog" 2>&1 && tar xf v3.6.3.tar.gz && success && echo -e "Successfully downloaded and unzipped YARA\n" || {
 
 			echo "Failed to download or unzip YARA. Skipping YARA installation"
 	        echo "See $bootstrapLog for more information"
@@ -280,7 +280,7 @@ yara() {
 
 		# Compile and install YARA
 
-		echo "Compiling and installing YARA..." && cd yara-3.5.0/ && ./bootstrap.sh >> "$bootstrapLog" 2>&1 && ./configure > /dev/null 2>> "$bootstrapLog" && make > /dev/null 2>> "$bootstrapLog" && sudo make install > /dev/null 2>> "$bootstrapLog" && ldconfig && success && echo -e "Successfully installed YARA\n" || {
+		echo "Compiling and installing YARA..." && cd yara-3.6.3/ && ./bootstrap.sh >> "$bootstrapLog" 2>&1 && ./configure > /dev/null 2>> "$bootstrapLog" && make > /dev/null 2>> "$bootstrapLog" && sudo make install > /dev/null 2>> "$bootstrapLog" && ldconfig && success && echo -e "Successfully installed YARA\n" || {
 
 			echo "Failed to compile or install YARA"
 	        echo "See $bootstrapLog for more information"
