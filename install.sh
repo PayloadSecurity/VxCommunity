@@ -534,7 +534,7 @@ main() {
     }
 
     # Download VxBootstrapUI
-    echo "Downloading VxBootstrapUI..." && ssh-agent bash -c "ssh-add "$installDir"/authKeyVxBootstrapUI &>> "$logFile"; git clone git@github.com:PayloadSecurity/VxBootstrapUI.git &>> $logFile"
+    echo "Downloading VxBootstrapUI..." && ssh-agent bash -c "ssh-add "$installDir"/authKeyVxBootstrapUI &>> "$logFile"; git clone --single-branch --branch SANDBOX-3976 git@github.com:PayloadSecurity/VxBootstrapUI.git &>> $logFile"
 
     if [ $? -eq 0 ]; then
 
@@ -551,7 +551,7 @@ main() {
     fi
 
     # Download VxBootstrap
-    echo "Downloading VxBootstrap..." && ssh-agent bash -c "ssh-add "$installDir"/authKeyVxBootstrap >> "$logFile" 2>&1 ; git clone git@github.com:PayloadSecurity/VxBootstrap.git >> "$logFile" 2>&1"
+    echo "Downloading VxBootstrap..." && ssh-agent bash -c "ssh-add "$installDir"/authKeyVxBootstrap >> "$logFile" 2>&1 ; git clone --single-branch --branch ubuntu-18 git@github.com:PayloadSecurity/VxBootstrap.git >> "$logFile" 2>&1"
 
     if [ $? -eq 0 ]; then
 
