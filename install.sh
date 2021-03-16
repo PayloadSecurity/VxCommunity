@@ -1,14 +1,14 @@
 #!/bin/bash
 # VxStream Sandbox installer for automated installation of VxStream Sandbox
-# Compatibility: Ubuntu 14.04 LTS and Ubuntu 16.04 LTS
+# Compatibility: Ubuntu 16.04 LTS
 
-# Copyright (C) 2018 Hybrid Analysis GmbH
+# Copyright (C) 2021 Hybrid Analysis GmbH
 #
 # Licensed  GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 # see https://github.com/PayloadSecurity/VxCommunity/blob/master/LICENSE.md
 #
-# Date - 30.06.2017
-# Version - 1.1.1
+# Date - 01.03.2021
+# Version - 1.5
 
 # Functions:
 #
@@ -32,7 +32,7 @@
 # * Exit code 126 - Run as root
 
 # Version
-version="1.1.1"
+version="1.5"
 
 # User validation for installing 
 
@@ -52,7 +52,7 @@ fi
 
 usage() {
 
-    echo "Copyright (C) 2017 Payload Security"
+    echo "Copyright (C) 2021 CrowdStrike Inc."
     echo "Version: $version"
     echo -e "\nDescription:"
     echo "VxStream Sandbox installer for automated installation of VxStream Sandbox."
@@ -233,6 +233,15 @@ conf() {
     # Get the status code of curl
     curlStatusCode=$(curl -A "VxStream Sandbox" -ISsk "$authKeyURL" 2>> "$logFile" | head -n 1 | cut -d$' ' -f2)
 
+    # VxBootstrap Archive Name
+    vxBootstrapArchiveName="VxBootstrap.zip"
+
+    # VxBootstrap Package URL
+    vxBootstrapURL="https://www.crowdstrike.com/wp-content/sandbox/$vxBootstrapArchiveName"
+
+    # VxBootstrap Directory Name
+    vxBootstrapDir="VxBootstrap"
+
 }
 
 # Run mandatory checks 
@@ -261,7 +270,7 @@ checks() {
     fi
 
     # Check if curl works 
-    curl -s -S www.google.com >> "$logFile" 2>&1 
+    curl -s -S www.google.com | head -1 >> "$logFile" 2>&1 
 
     if [ $? -eq 0 ]; then
         success && echo "Curl is working"
@@ -359,18 +368,13 @@ checks() {
 
     elif [ "$codeName" == "trusty" ]; then
 
-        success
-        echo -e "Distribution used: Ubuntu 14.04\n"
-
-    else
-
         failure
         echo "Fatal error: release used: $releaseDescription"
-        echo "Supported releases are: Ubuntu 14.04 LTS and Ubuntu 16.04 LTS. Exiting..."
+        echo "Supported release is Ubuntu 16.04 LTS. Exiting..."
         exit 1
-
+        
     fi
-
+    
 }
 
 # Download authentication key, repositories and initialize VxBootstrapUI 
@@ -453,6 +457,14 @@ main() {
         fi
 
     fi
+
+    # Install 7zip and unrar to unpack VxBootstrap.zip later
+    echo -e "Updating Repositories ... sudo needed:" && sudo apt update -q >> "$logFile" 2>&1 && echo -e "Installing 7zip, Unrar && zip ..." && sudo apt install -y -q p7zip-full p7zip-rar zip unzip unrar >> "$logFile" 2>&1 && success && echo -e "Successfully installed $
+
+        failure
+        echo "Fatal error: failed to install 7zip or unrar. Exiting ..."
+        exit 1
+    }
 
     # Download authentication key
     curl -A "VxStream Sandbox" -k -s -S "$authKeyURL" -o "$installDir"/"$authKeyFileName" 2>> "$logFile" && success && echo "Successfully downloaded authentication key" || {
@@ -548,22 +560,23 @@ main() {
 
     fi
 
-    # Download VxBootstrap 
-    echo "Downloading VxBootstrap..." && ssh-agent bash -c "ssh-add "$installDir"/authKeyVxBootstrap >> "$logFile" 2>&1 ; git clone git@github.com:PayloadSecurity/VxBootstrap.git >> "$logFile" 2>&1"
-
-    if [ $? -eq 0 ]; then
-
-        success
-        echo -e "Successfully downloaded VxBootstrap\n"
-
-    else
+    # Download VxBootstrap Archive
+    echo "Downloading VxBootstrap Package" && curl -A "VxStream Sandbox" -k -s -S "$vxBootstrapURL" -o "$installDir"/"$vxBootstrapArchiveName" 2>> "$logFile" && success && echo "Successfully downloaded VxBootstrap" || {
 
         failure
-        echo "Fatal error: Was not able to download VxBootstrap"
+        echo "Fatal error: failed to download VxBootstrap"
         echo "See $logFile for more information. Exiting..."
         exit 1
+    }
 
-    fi
+    # Unzip VxBootstrap Archive
+
+    echo "Unpacking VxBootstrap..." && 7z -y x "$installDir"/"$vxBootstrapArchiveName" -o"$installDir" && success && echo -e "Successfully unzipped the archive with 7zip" || {
+
+        failure
+        echo "Fatal error: failed to unpack the archive using 7zip. Exiting ..."
+        exit 1
+    }
     
     # Create a soft link of VxBootstrap to user home dir if it does not exist yet
     test -d $HOME/VxBootstrap
@@ -587,9 +600,9 @@ main() {
     }
 
     # Initialize VxBootstrapUI 
-    echo -e "Initializing VxBootstrapUI [need root rights]...\n" && sudo -k
+    echo -e "Initializing VxBootstrapUI [need to ensure root rights]...\n" && sudo -k
 
-    # Promt for user password until a correct password has been provided
+    # Prompt for user password until a correct password has been provided
     while [[ "$userId" != 0 ]]; do
 
         # If --root-password was not provided, then prompt for it
