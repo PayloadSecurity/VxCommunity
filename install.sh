@@ -1,6 +1,6 @@
 #!/bin/bash
 # VxStream Sandbox installer for automated installation of VxStream Sandbox
-# Compatibility: Ubuntu 20.04 LTS
+# Compatibility: Ubuntu 18.04 LTS
 
 # Copyright (C) 2021 CrowdStrike Inc
 #
